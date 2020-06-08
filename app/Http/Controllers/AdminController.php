@@ -56,7 +56,7 @@ class AdminController extends Controller
 			'name' => 'required', 
 			'email' => 'required|email|unique:users', 
 			'mobile_no' => 'required|unique:users',
-			'district' => 'required',
+			'district_id' => 'required',
 			'role_id' => 'required',
 			'status_id' => 'required'
 		]); 
@@ -130,7 +130,7 @@ class AdminController extends Controller
 			'password' => 'required',
 			'name' => 'required', 
 			'mobile_no' => 'required',
-			'district' => 'required',
+			'district_id' => 'required',
 			'role_id' => 'required',
 			'status_id' => 'required'
 		]); 
