@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\District;
+use Illuminate\Support\Facades\Auth;
+use Validator;
 class DistrictController extends Controller
 {
     /**

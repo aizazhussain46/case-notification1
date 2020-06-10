@@ -70,7 +70,7 @@ class PatientController extends Controller
 		$patient = Patient::where('patients.id', $pat->id)->leftJoin('users', 'patients.user_id', '=', 'users.id')
         ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
         ->select('patients.*','users.name as doctor', 'statuses.status')
-        ->get();
+        ->first();
 		return response()->json([
 			'success' => true,
 			'data' => $patient
@@ -138,7 +138,7 @@ class PatientController extends Controller
 		$patient = Patient::where('patients.id', $id)->leftJoin('users', 'patients.user_id', '=', 'users.id')
         ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
         ->select('patients.*','users.name as doctor', 'statuses.status')
-        ->get();
+        ->first();
 		return response()->json([
 			'success' => true,
 			'data' => $patient

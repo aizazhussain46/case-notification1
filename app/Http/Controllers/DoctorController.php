@@ -6,9 +6,10 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Role;
 use App\Status;
+use App\Patient;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-class AdminController extends Controller
+class DoctorController extends Controller
 {
 	public function __construct()
     {
@@ -21,10 +22,10 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $user = User::leftJoin('roles', 'users.role_id', '=', 'roles.id')
+        $user = User::where('users.role_id', 3)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
         ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
         ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
-        ->select('users.*','roles.role','districts.district','statuses.status')
+        ->select('users.*','roles.role', 'districts.district', 'statuses.status')
         ->get();
         return response()->json([
 			'success' => true,
@@ -51,13 +52,10 @@ class AdminController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [ 
-			'username' => 'required',
-			'password' => 'required',
 			'name' => 'required', 
 			'email' => 'required|email|unique:users', 
 			'mobile_no' => 'required|unique:users',
 			'district_id' => 'required',
-			'role_id' => 'required',
 			'status_id' => 'required'
 		]); 
 		if ($validator->fails()) { 
@@ -70,19 +68,20 @@ class AdminController extends Controller
 
 		}
 
-		$input = $request->all(); 
-		$input['password'] = bcrypt($input['password']); 
-		$create = User::create($input); 
-        $user = User::where('users.id', $create->id)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
+		$input = $request->all();
+		$input['role_id'] = 3;
+		$input['username'] = strtolower($input['name']);
+		$add = User::create($input); 
+
+		$user = User::where('users.id', $add->id)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
         ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
         ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
         ->select('users.*','roles.role', 'districts.district', 'statuses.status')
         ->first();
-
-		return response()->json([
+        return response()->json([
 			'success' => true,
 			'data' => $user
-		],200); 
+		],200);
     }
 
     /**
@@ -93,16 +92,7 @@ class AdminController extends Controller
      */
     public function show($id)
     {
-        $user = User::where('users.id', $id)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
-        ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
-        ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
-        ->select('users.*','roles.role', 'districts.district', 'statuses.status')
-        ->get();
-
-        return response()->json([
-			'success' => true,
-			'data' => $user
-		],200);
+        //
     }
 
     /**
@@ -126,12 +116,10 @@ class AdminController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [ 
-			'username' => 'required',
-			'password' => 'required',
 			'name' => 'required', 
+			'email' => 'required|email', 
 			'mobile_no' => 'required',
 			'district_id' => 'required',
-			'role_id' => 'required',
 			'status_id' => 'required'
 		]); 
 		if ($validator->fails()) { 
@@ -144,18 +132,19 @@ class AdminController extends Controller
 
 		}
 
-		$input = $request->all(); 
-		$input['password'] = bcrypt($input['password']); 
+		$input = $request->all();
+		$input['username'] = strtolower($input['name']);
 		$update = User::where('id', $id)->update($input); 
-        $user = User::where('users.id', $id)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
+		
+		$user = User::where('users.id', $id)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
         ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
         ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
         ->select('users.*','roles.role', 'districts.district', 'statuses.status')
         ->first();
-		return response()->json([
+        return response()->json([
 			'success' => true,
 			'data' => $user
-		],200);  
+		],200);
     }
 
     /**
@@ -169,46 +158,5 @@ class AdminController extends Controller
         return (User::find($id)->delete()) 
                 ? [ 'response_status' => true, 'message' => 'user has been deleted' ] 
                 : [ 'response_status' => false, 'message' => 'user cannot delete' ];
-    }
-
-    public function add_doctor(Request $request)
-    {
-        $validator = Validator::make($request->all(), [ 
-			'name' => 'required', 
-			'email' => 'required|email|unique:users', 
-			'mobile_no' => 'required|unique:users',
-			'district_id' => 'required',
-			'role_id' => 'required',
-			'status_id' => 'required'
-		]); 
-		if ($validator->fails()) { 
-
-			return response()->json([
-			'success' => false,
-			'errors' => $validator->errors()
-		
-		]); 
-
-		}
-
-		$input = $request->all(); 
-		$user = User::create($input); 
-		
-		return response()->json([
-			'success' => true,
-			'data' => $user
-		],200); 
-    }
-    public function doctors_list()
-    {
-        $user = User::where('users.role_id', 3)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
-        ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
-        ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
-        ->select('users.*','roles.role', 'districts.district', 'statuses.status')
-        ->get();
-        return response()->json([
-			'success' => true,
-			'data' => $user
-		],200);
     }
 }
