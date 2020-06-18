@@ -13,7 +13,7 @@ class PatientController extends Controller
 {
     public function __construct()
     {
-        //$this->middleware('auth:api')->except('register','login','logout');
+        $this->middleware('auth:api')->except('register','login','logout');
 	}
     /**
      * Display a listing of the resource.
@@ -25,6 +25,7 @@ class PatientController extends Controller
         $patient = Patient::leftJoin('users', 'patients.user_id', '=', 'users.id')
         ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
         ->select('patients.*','users.name as doctor', 'statuses.status')
+        ->orderBy('patients.id', 'desc')
         ->get();
         return $patient;
     }
@@ -53,7 +54,9 @@ class PatientController extends Controller
 			'p_cnic' => 'required', 
 			'p_mobile_no' => 'required', 
 			'p_address' => 'required',
-			'status_id' => 'required'
+            'status_id' => 'required',
+            'field_officer_id' => 'required',
+            'district_id' => 'required'
 		]); 
 		if ($validator->fails()) { 
 
@@ -64,7 +67,7 @@ class PatientController extends Controller
 		]); 
 
 		}
-
+        
 		$input = $request->all(); 
         $pat = Patient::create($input); 
 		$patient = Patient::where('patients.id', $pat->id)->leftJoin('users', 'patients.user_id', '=', 'users.id')
@@ -121,7 +124,9 @@ class PatientController extends Controller
 			'p_cnic' => 'required', 
 			'p_mobile_no' => 'required', 
 			'p_address' => 'required',
-			'status_id' => 'required'
+            'status_id' => 'required',
+            'field_officer_id' => 'required',
+            'district_id' => 'required'
 		]); 
 		if ($validator->fails()) { 
 
@@ -156,5 +161,53 @@ class PatientController extends Controller
         return (Patient::find($id)->delete()) 
                 ? [ 'response_status' => true, 'message' => 'Patient has been deleted' ] 
                 : [ 'response_status' => false, 'message' => 'Patient cannot delete' ];
+    }
+
+
+    public function add_patient_record(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [ 
+			'supporter_name' => 'required',
+			'supporter_type' => 'required',
+			'supporter_contact' => 'required', 
+			'referred_by' => 'required', 
+			'father_name' => 'required',
+            'gender' => 'required',
+            'age' => 'required', 
+			'occupation' => 'required', 
+			'dob' => 'required',
+			'reg_date' => 'required'    
+		]); 
+		if ($validator->fails()) { 
+
+			return response()->json([
+			'success' => false,
+			'errors' => $validator->errors()
+		
+		]); 
+
+		}
+
+		$input = $request->all(); 
+        $pat = Patient::where('id', $id)->update($input); 
+		$patient = Patient::where('patients.id', $id)->leftJoin('users', 'patients.user_id', '=', 'users.id')
+        ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
+        ->select('patients.*','users.name as doctor', 'statuses.status')
+        ->first();
+		return response()->json([
+			'success' => true,
+			'data' => $patient
+		],200);
+    }
+    public function show_patients_by_field_officer(){
+        $user = Auth::user();
+        $patient = Patient::where('patients.field_officer_id', $user->id)
+        ->leftJoin('users', 'patients.user_id', '=', 'users.id')
+        ->leftJoin('users as fo', 'patients.field_officer_id', '=', 'fo.id')
+        ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
+        ->select('patients.*','users.name as doctor', 'fo.name as field officer', 'statuses.status')
+        ->orderBy('patients.id', 'desc')
+        ->get();
+        return $patient;
     }
 }

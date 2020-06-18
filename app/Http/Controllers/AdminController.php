@@ -12,7 +12,7 @@ class AdminController extends Controller
 {
 	public function __construct()
     {
-        //$this->middleware('auth:api')->except('register','login','logout');
+        $this->middleware('auth:api')->except('register','login','logout');
 	}
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class AdminController extends Controller
      */
     public function index()
     {
-        $user = User::leftJoin('roles', 'users.role_id', '=', 'roles.id')
+        $user = User::where('roles.id', '!=', 3)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
         ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
         ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
         ->select('users.*','roles.role','districts.district','statuses.status')
@@ -169,46 +169,5 @@ class AdminController extends Controller
         return (User::find($id)->delete()) 
                 ? [ 'response_status' => true, 'message' => 'user has been deleted' ] 
                 : [ 'response_status' => false, 'message' => 'user cannot delete' ];
-    }
-
-    public function add_doctor(Request $request)
-    {
-        $validator = Validator::make($request->all(), [ 
-			'name' => 'required', 
-			'email' => 'required|email|unique:users', 
-			'mobile_no' => 'required|unique:users',
-			'district_id' => 'required',
-			'role_id' => 'required',
-			'status_id' => 'required'
-		]); 
-		if ($validator->fails()) { 
-
-			return response()->json([
-			'success' => false,
-			'errors' => $validator->errors()
-		
-		]); 
-
-		}
-
-		$input = $request->all(); 
-		$user = User::create($input); 
-		
-		return response()->json([
-			'success' => true,
-			'data' => $user
-		],200); 
-    }
-    public function doctors_list()
-    {
-        $user = User::where('users.role_id', 3)->leftJoin('roles', 'users.role_id', '=', 'roles.id')
-        ->leftJoin('districts', 'users.district_id', '=', 'districts.id')
-        ->leftJoin('statuses', 'users.status_id', '=', 'statuses.id')
-        ->select('users.*','roles.role', 'districts.district', 'statuses.status')
-        ->get();
-        return response()->json([
-			'success' => true,
-			'data' => $user
-		],200);
     }
 }

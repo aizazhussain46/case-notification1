@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Role;
+use App\User;
+use App\Status;
+use App\Diagnosis;
+use App\Patient;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-class RoleController extends Controller
+class DiagnosisController extends Controller
 {
-	public function __construct()
+    public function __construct()
     {
         $this->middleware('auth:api')->except('register','login','logout');
 	}
@@ -19,7 +22,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        return response()->json(Role::all());
+        //
     }
 
     /**
@@ -29,7 +32,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-        
+        //
     }
 
     /**
@@ -40,23 +43,17 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [ 
-			'role' => 'required'
-		]); 
-		if ($validator->fails()) { 
-
-			return response()->json([
-			'success' => false,
-			'errors' => $validator->errors()
-		]); 
-		}
-
-		$input = $request->all(); 
-		$role = Role::create($input); 
-		return response()->json([
-			'success' => true,
-			'data' => $role
-		],200); 
+        $user = Auth::user();
+        
+        $input = $request->all();
+        $input['field_officer_id'] = $user->id; 
+        $diagnosis = Diagnosis::create($input);
+        if($diagnosis){
+            return response()->json([
+                'success' => true,
+                'data' => $diagnosis
+            ],200);
+        }
     }
 
     /**
@@ -67,7 +64,14 @@ class RoleController extends Controller
      */
     public function show($id)
     {
-        return response()->json(Role::find($id));
+        $diagnosis = Diagnosis::where('patient_id', $id)
+        ->leftJoin('users', 'diagnoses.field_officer_id', '=', 'users.id')
+        ->leftJoin('patients', 'diagnoses.patient_id', '=', 'patients.id')
+        ->select('diagnoses.*','users.name as field officer','patients.p_name as patient')->first();
+		return response()->json([
+			'success' => true,
+			'data' => $diagnosis
+		],200);
     }
 
     /**
@@ -90,23 +94,15 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [ 
-			'role' => 'required'
-		]); 
-		if ($validator->fails()) { 
-
-			return response()->json([
-			'success' => false,
-			'errors' => $validator->errors()
-		]); 
-		}
-
-		$input = $request->all(); 
-		$role = Role::where('id', $id)->update($input); 
-		return response()->json([
-			'success' => true,
-			'data' => $role
-		],200); 
+        $input = $request->all(); 
+        $update = Diagnosis::where('id', $id)->update($input);
+        if($update){
+            $diagnosis = Diagnosis::find($id);
+            return response()->json([
+                'success' => true,
+                'data' => $diagnosis
+            ],200);
+        }
     }
 
     /**
@@ -117,13 +113,8 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        return (Role::find($id)->delete()) 
-                ? [ 'response_status' => true, 'message' => 'role has been deleted' ] 
-                : [ 'response_status' => false, 'message' => 'role cannot delete' ];
+        return (Diagnosis::find($id)->delete()) 
+                ? [ 'response_status' => true, 'message' => 'Diagnosis has been deleted' ] 
+                : [ 'response_status' => false, 'message' => 'Diagnosis cannot delete' ];
     }
-	
-	public function roles_without_doctor(){
-		$role = Role::where('id', '!=', 3)->get();
-		return response()->json($role);
-	}
 }

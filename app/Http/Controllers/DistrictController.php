@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 class DistrictController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api')->except('register','login','logout');
+	}
     /**
      * Display a listing of the resource.
      *

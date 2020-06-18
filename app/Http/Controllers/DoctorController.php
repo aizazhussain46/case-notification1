@@ -13,7 +13,7 @@ class DoctorController extends Controller
 {
 	public function __construct()
     {
-        //$this->middleware('auth:api')->except('register','login','logout');
+        $this->middleware('auth:api')->except('register','login','logout');
 	}
     /**
      * Display a listing of the resource.
@@ -56,7 +56,9 @@ class DoctorController extends Controller
 			'email' => 'required|email|unique:users', 
 			'mobile_no' => 'required|unique:users',
 			'district_id' => 'required',
-			'status_id' => 'required'
+            'status_id' => 'required',
+            'pmdc_no' => 'required',
+			'clinic' => 'required'
 		]); 
 		if ($validator->fails()) { 
 
@@ -120,7 +122,9 @@ class DoctorController extends Controller
 			'email' => 'required|email', 
 			'mobile_no' => 'required',
 			'district_id' => 'required',
-			'status_id' => 'required'
+            'status_id' => 'required',
+            'pmdc_no' => 'required',
+			'clinic' => 'required'
 		]); 
 		if ($validator->fails()) { 
 

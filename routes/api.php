@@ -26,6 +26,12 @@ Route::resource('manage-users', 'AdminController');
 Route::resource('doctors', 'DoctorController');
 
 Route::resource('role', 'RoleController');
+Route::get('user_roles', 'RoleController@roles_without_doctor');
 Route::resource('status', 'StatusController');
-Route::resource('patient', 'PatientController');
 Route::resource('district', 'DistrictController');
+
+Route::resource('patient', 'PatientController');
+Route::post('add_patient/{id}', 'PatientController@add_patient_record');
+Route::resource('diagnosis', 'DiagnosisController');
+Route::resource('followup', 'FollowupController');
+Route::get('patients_by_field_officer', 'PatientController@show_patients_by_field_officer');
