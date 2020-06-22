@@ -23,8 +23,9 @@ class PatientController extends Controller
     public function index()
     {
         $patient = Patient::leftJoin('users', 'patients.user_id', '=', 'users.id')
+        ->leftJoin('users as fo', 'patients.field_officer_id', '=', 'fo.id')
         ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
-        ->select('patients.*','users.name as doctor', 'statuses.status')
+        ->select('patients.*','users.name as doctor', 'statuses.status', 'fo.id as fo_id', 'fo.name as fo')
         ->orderBy('patients.id', 'desc')
         ->get();
         return $patient;

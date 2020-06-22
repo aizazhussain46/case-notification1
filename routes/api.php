@@ -35,3 +35,4 @@ Route::post('add_patient/{id}', 'PatientController@add_patient_record');
 Route::resource('diagnosis', 'DiagnosisController');
 Route::resource('followup', 'FollowupController');
 Route::get('patients_by_field_officer', 'PatientController@show_patients_by_field_officer');
+Route::post('officers_by_district/{id}', 'AdminController@field_officer_by_district');

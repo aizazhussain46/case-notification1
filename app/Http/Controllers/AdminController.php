@@ -170,4 +170,8 @@ class AdminController extends Controller
                 ? [ 'response_status' => true, 'message' => 'user has been deleted' ] 
                 : [ 'response_status' => false, 'message' => 'user cannot delete' ];
     }
+    public function field_officer_by_district($id){
+        $officer = User::where(['district_id'=> $id, 'role_id'=>2])->select('id as fo_id','name as fo')->get();
+        return $officer;
+    }
 }
