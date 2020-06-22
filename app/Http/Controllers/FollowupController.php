@@ -64,6 +64,11 @@ class FollowupController extends Controller
         $record = $request->all();
         $user = Auth::user();
         $f_up = array("patient_id"=>$record['patient_id'], "visits"=>$record['visits'], 'field_officer_id'=>$user->id);
+        if(!empty($record['treatment_outcome'])){
+            $f_up['treatment_outcome'] = $record['treatment_outcome'];
+            $pat = Patient::where('id', $record['patient_id'])->update(["status_id"=> 3]);
+        }
+        
         $followup = Followup::create($f_up);
         $inv = array(
             'followup_id'=>$followup->id, 
