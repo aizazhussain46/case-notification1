@@ -7,6 +7,7 @@ use App\User;
 use App\Role;
 use App\Status;
 use App\Patient;
+use App\Schedule;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 class PatientController extends Controller
@@ -70,7 +71,25 @@ class PatientController extends Controller
 		}
         
 		$input = $request->all(); 
-        $pat = Patient::create($input); 
+        $pat = Patient::create($input);
+        
+        $fo = User::find($pat->field_officer_id);
+        /* SMS send code */
+
+        /* save logs to database */
+        $type = 'patient register';
+        $fields = array(
+            'patient_name'=> $pat->p_name, 
+            'patient_mobile_no'=> $pat->p_mobile_no,
+            'field_officer'=> $fo->name, 
+            'fo_mobile_no'=> $fo->mobile_no,
+            'type'=> $type
+        );
+
+        $schedule = Schedule::create($fields);
+
+
+
 		$patient = Patient::where('patients.id', $pat->id)->leftJoin('users', 'patients.user_id', '=', 'users.id')
         ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
         ->select('patients.*','users.name as doctor', 'statuses.status')
