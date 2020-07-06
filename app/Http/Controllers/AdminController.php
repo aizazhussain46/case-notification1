@@ -174,4 +174,11 @@ class AdminController extends Controller
         $officer = User::where(['district_id'=> $id, 'role_id'=>2])->select('id as fo_id','name as fo')->get();
         return $officer;
     }
+    public function get_all_field_officers(){
+        $user = User::where('role_id', 2)->get();
+        return response()->json([
+			'success' => true,
+			'data' => $user
+		],200);
+    }
 }
