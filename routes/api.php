@@ -37,5 +37,6 @@ Route::resource('followup', 'FollowupController');
 Route::get('patients_by_field_officer', 'PatientController@show_patients_by_field_officer');
 Route::post('officers_by_district/{id}', 'AdminController@field_officer_by_district');
 Route::get('field_officers', 'AdminController@get_all_field_officers');
+Route::get('patient_details/{id}', 'FollowupController@followups_by_patient');
 
 Route::get('send_reminder', 'ScheduleController@index');

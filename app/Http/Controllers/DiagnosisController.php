@@ -22,7 +22,11 @@ class DiagnosisController extends Controller
      */
     public function index()
     {
-        //
+        $diagnosis = Diagnosis::all();
+        return response()->json([
+            'success' => true,
+            'data' => $diagnosis
+        ],200);
     }
 
     /**

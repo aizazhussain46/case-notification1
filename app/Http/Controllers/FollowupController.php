@@ -200,4 +200,32 @@ class FollowupController extends Controller
         return response()->json($msg);
     }
 
+    public function followups_by_patient($id)
+    {
+        $patient = Patient::where('patients.id', $id)
+        ->leftJoin('users', 'patients.user_id', '=', 'users.id')
+        ->leftJoin('users as fo', 'patients.field_officer_id', '=', 'fo.id')
+        ->leftJoin('statuses', 'patients.status_id', '=', 'statuses.id')
+        ->select('patients.*','users.name as doctor', 'statuses.status', 'fo.id as fo_id', 'fo.name as fo')
+        ->orderBy('patients.id', 'desc')
+        ->first();
+
+        $diagnosis = Diagnosis::where('patient_id', $id)->first();
+        $patient->diagnosis = $diagnosis;
+        $data = array();
+        $followup = Followup::where('followups.patient_id', $id)
+        ->leftJoin('users', 'followups.field_officer_id', '=', 'users.id')
+        ->select('followups.*','users.name as field officer')->get();
+        foreach($followup as $fup){
+            $inv = Investigation::where('followup_id', $fup->id)->get();
+            $tr = Treatment::where('followup_id', $fup->id)->get();
+            $fup->investigation = $inv;
+            $fup->treatment = $tr;
+            $data[] = $fup;
+        }
+        $patient->followup = $data;
+        return $patient;
+        
+    }
+
 }
