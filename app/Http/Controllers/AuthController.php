@@ -33,32 +33,37 @@ class AuthController extends Controller
 	}
 
 	public function register(Request $request) { 
-		$validator = Validator::make($request->all(), [ 
-			'name' => 'required', 
-			'email' => 'required|email|unique:users', 
-			'mobile_no' => 'required|unique:users',
-			'city' => 'required'
-		]); 
-		if ($validator->fails()) { 
+		// $validator = Validator::make($request->all(), [ 
+		// 	'role_id' => 'required',
+		// 	'team_lead_id' => 'required',
+		// 	'dept_id' => 'required',
+		// 	'name' => 'required', 
+		// 	'email' => 'required|email|unique:users',
+		// 	'password' => 'required', 
+		// 	'mobile_no' => 'required|unique:users',
+		// 	'cnic' => 'required',
+		// 	'district_id' => 'required'
+		// ]); 
+		// if ($validator->fails()) { 
 
-			return response()->json([
-			'success' => false,
-			'errors' => $validator->errors()
+		// 	return response()->json([
+		// 	'success' => false,
+		// 	'errors' => $validator->errors()
 		
-		]); 
+		// ]); 
 
-		}
+		// }
 
-		$input = $request->all(); 
-		//$input['master'] = 1;
-		//$input['password'] = bcrypt($input['password']); 
-		$user = User::create($input); 
-		//$token = $user->createToken('myApp')->accessToken; 
+		// $input = $request->all(); 
+		// //$input['master'] = 1;
+		// $input['password'] = bcrypt($input['password']); 
+		// $user = User::create($input); 
+		// //$token = $user->createToken('myApp')->accessToken; 
 
-		return response()->json([
-			'success' => true,
-			'data' => $user
-		],200); 
+		// return response()->json([
+		// 	'success' => true,
+		// 	'data' => $user
+		// ],200); 
 
 	}
 

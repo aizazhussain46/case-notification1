@@ -122,8 +122,4 @@ class RoleController extends Controller
                 : [ 'response_status' => false, 'message' => 'role cannot delete' ];
     }
 	
-	public function roles_without_doctor(){
-		$role = Role::where('id', '!=', 3)->get();
-		return response()->json($role);
-	}
 }

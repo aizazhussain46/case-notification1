@@ -67,7 +67,7 @@ class DistrictController extends Controller
      */
     public function show($id)
     {
-        //
+        return response()->json(District::find($id));
     }
 
     /**
@@ -90,7 +90,23 @@ class DistrictController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [ 
+			'district' => 'required'
+		]); 
+		if ($validator->fails()) { 
+
+			return response()->json([
+			'success' => false,
+			'errors' => $validator->errors()
+		]); 
+		}
+
+		$input = $request->all(); 
+		$district = District::where('id', $id)->update($input); 
+		return response()->json([
+			'success' => true,
+			'data' => $district
+		],200); 
     }
 
     /**
@@ -101,6 +117,8 @@ class DistrictController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return (District::find($id)->delete()) 
+                ? [ 'response_status' => true, 'message' => 'district has been deleted' ] 
+                : [ 'response_status' => false, 'message' => 'district cannot delete' ];
     }
 }
